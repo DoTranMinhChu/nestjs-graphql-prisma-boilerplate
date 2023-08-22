@@ -1,0 +1,41 @@
+version: "3"
+services:
+  postgres-nestjs:
+    image: postgres:14.1-alpine
+    container_name: postgres-nestjs
+    hostname: postgres-nestjs
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: nestjs-db
+    networks:
+      - shared-network
+    volumes:
+      - postgres-nestjs-data:/var/lib/postgresql/data
+    restart: unless-stopped
+  nestjs-server:
+    image: dotranminhchu/nestjs-server
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nestjs-server
+    volumes:
+      - .:/var/www
+    networks:
+      - shared-network
+    depends_on:
+      - postgres-nestjs
+    ports:
+      - "8000:8000"
+    restart: always
+
+volumes:
+  postgres-nestjs-data:
+networks:
+  nestjs-server:
+  shared-network:
+    external: true
+    name: shared-network

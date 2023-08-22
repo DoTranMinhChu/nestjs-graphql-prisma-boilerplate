@@ -1,0 +1,57 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL_WITH_SCHEMA")
+}
+
+model User {
+    id           String            @id @default(uuid()) @map("id")
+    createdAt    DateTime?         @default(now()) @map("created_at")
+    updatedAt    DateTime?         @updatedAt @map("updated_at")
+    deletedAt    DateTime?         @map("deleted_at")
+    slug         String?           @map("slug")
+    name         String?           @map("name") @db.VarChar(80)
+    username     String?           @map("username") @db.VarChar(80)
+    dob          DateTime?         @map("dob")
+    gender       Gender            @default(ORTHER) @map("gender")
+    phone        String?           @map("phone")
+    email        String?           @map("email")
+    password     String?           @map("password")
+    loginType    LoginType         @default(INAPP) @map("login_type")
+    avatarUrl    String?           @map("avatar_url")
+    ipv4         String?           @map("ipv4") @db.Char(40)
+    refreshToken RefreshTokenUser?
+
+    @@map("user")
+}
+
+model RefreshTokenUser {
+    id           String    @id @default(uuid()) @map("id")
+    createdAt    DateTime? @default(now()) @map("created_at")
+    updatedAt    DateTime? @updatedAt @map("updated_at")
+    deletedAt    DateTime? @map("deleted_at")
+    refreshToken String?   @map("refresh_token")
+    user         User      @relation(fields: [userId], references: [id])
+    userId       String    @unique @map("user_id")
+
+    @@map("refresh_token_user")
+}
+
+enum LoginType {
+    INAPP
+    FACEBOOK
+    GOOGLE
+    KAKAO
+    APPLE
+    PHONE
+}
+
+enum Gender {
+    MALE
+    FAMALE
+    ORTHER
+    PRIVATE
+}
